@@ -120,7 +120,9 @@ const GuidedProcess = () => {
                                     {step.question && <h4 className="step-question">{step.question}</h4>}
                                     <div className="step-text">
                                         {step.content.split('\n\n').map((paragraph, i) => (
-                                            <p key={i}>{paragraph}</p>
+                                            <p key={i} style={{ whiteSpace: 'pre-line', marginBottom: '16px' }}>
+                                                {paragraph}
+                                            </p>
                                         ))}
                                     </div>
                                 </div>
