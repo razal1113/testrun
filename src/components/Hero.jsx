@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import heroBg from '../assets/hero-bg.jpg';
+import heroBg from '../assets/hero-new.jpg';
 
 const Hero = () => {
   const [loaded, setLoaded] = useState(false);
@@ -14,9 +14,9 @@ const Hero = () => {
       <div className="hero-overlay"></div>
 
       <div className={`hero-content ${loaded ? 'animate' : ''}`}>
-        <h1>Alkolukko – rauhallisesti ja selkeästi, askel kerrallaan</h1>
-        <p>Tämä sivu auttaa sinua ymmärtämään alkolukkoon liittyvän prosessin Suomessa.<br />
-          Käymme asiat läpi selkeästi ja ilman kiirettä.</p>
+        <h1>Alkolukko valvottuun ajo-oikeuteen</h1>
+        <p>Breatech Finland tarjoaa hyväksytyt alkolukot sekä asiantuntevaa tukea<br />
+          alkolukkoajokortin hankintaan Suomessa.</p>
 
         <a href="#ota-yhteytta" className="cta-button">Ota yhteyttä</a>
       </div>

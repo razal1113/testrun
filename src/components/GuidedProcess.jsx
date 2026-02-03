@@ -8,33 +8,7 @@ const GuidedProcess = () => {
     const timelineRef = useRef(null);
     const stepsRef = useRef([]);
 
-    const steps = [
-        {
-            number: 1,
-            title: "Miksi olet täällä",
-            content: "Alkolukkoon liittyvä tilanne voi tuntua epäselvältä tai kuormittavalta. Tämän sivun tarkoitus on auttaa sinua ymmärtämään kokonaisuus rauhallisesti."
-        },
-        {
-            number: 2,
-            title: "Mitä alkolukko tarkoittaa",
-            content: "Alkolukko on ajoneuvoon asennettava laite, joka estää käynnistyksen, jos kuljettajan hengityksessä havaitaan alkoholia. Sen tarkoitus on lisätä turvallisuutta – ei rangaista."
-        },
-        {
-            number: 3,
-            title: "Miten prosessi alkaa",
-            content: "Prosessi käynnistyy yleensä viranomaisen päätöksellä tai ohjeistuksella. Saat selkeät tiedot seuraavista vaiheista ja tarvittavista toimista."
-        },
-        {
-            number: 4,
-            title: "Miten arki toimii alkolukon kanssa",
-            content: "Alkolukko on osa normaalia arkea. Laite pyytää hengitysnäytteen ajoneuvon käynnistyksen yhteydessä ja tarvittaessa ajon aikana."
-        },
-        {
-            number: 5,
-            title: "Mitä tapahtuu seuraavaksi",
-            content: "Kun määräaika ja ehdot täyttyvät, prosessi etenee päätökseen. Saat ohjeet jatkoa varten ja tiedät, milloin seuraava vaihe on edessä."
-        }
-    ];
+
 
     useEffect(() => {
         // Create timeline line growth animation
@@ -87,9 +61,10 @@ const GuidedProcess = () => {
     return (
         <section id="ohjattu-prosessi" className="guided-process">
             <div className="container">
-                <h2 className="gp-heading">Ohjattu prosessi</h2>
+                <h2 className="gp-heading">Ajokortin saamiseen tarvittavat toimenpiteet</h2>
                 <p className="gp-intro">
-                    Käymme alkolukkoprosessin läpi askel kerrallaan. Vieritä alaspäin omaan tahtiin.
+                    Alla olevat vaiheet ohjaavat sinua askel askeleelta alkolukkoajokortin
+                    hakemisessa ja alkolukon vuokraamisessa.
                 </p>
 
                 <div className="timeline-container">
@@ -103,9 +78,37 @@ const GuidedProcess = () => {
 
                     {/* Steps */}
                     <div className="steps-container">
-                        {steps.map((step, index) => (
+                        {[
+                            {
+                                number: 1,
+                                title: "KYSYMYS",
+                                question: "Oletko pyytänyt tai saanut poliisilta luvan valvottuun ajo-oikeuteen?",
+                                content: "Valvottua ajo-oikeutta kannattaa pyytää poliisilta heti tai viimeistään rattijuopumusasian käsittelyn yhteydessä tuomioistuimelta.\n\nSuosittelemme varmistamaan poliisilta, että sinulla on mahdollisuus saada alkolukkoajokortti.\n\nPoliisi antaa tarvittaessa lisätietoja alkolukkoajokortin hakemisesta ja siihen liittyvistä vaatimuksista."
+                            },
+                            {
+                                number: 2,
+                                title: "KYSYMYS",
+                                question: "Oletko käynyt lääkärin tai muun terveydenhuollon ammattihenkilön kanssa keskustelun päihteiden käytöstä ja saanut siitä todistuksen?",
+                                content: "Hanki todistus lääkärin tai muun terveydenhuollon ammattihenkilön kanssa käydystä keskustelusta (päihteiden käyttö).\n\nTodistus liitetään ajokorttihakemukseen ja toimitetaan poliisille.\n\nKun toimitat kaikki tarvittavat dokumentit poliisille, poliisi voi myöntää sinulle väliaikaisen ajokortin."
+                            },
+                            {
+                                number: 3,
+                                title: "Vuokraa alkolukko",
+                                content: "Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.\n\nSopimuksen täyttämisen jälkeen allekirjoitat sopimuksen ”Allekirjoita”-painikkeen kautta sähköisesti. Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.\n\nVuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.\n\nMikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.\n\nMikäli luottotiedot eivät ole kunnossa, saat ilmoituksen, että vuokrasopimus edellyttää takaajaa.\n\nTällöin voit syöttää takaajan tiedot suoraan vuokrasopimukseen ja lähettää takaajalle linkin sähköistä allekirjoitusta varten.\n\nVuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen."
+                            },
+                            {
+                                number: 4,
+                                title: "Varaa alkolukon asennus ja auton muutoskatsastus",
+                                content: "Kun painat ”Varaa asennus”, sinut ohjataan suoraan yhteistyökumppanimme (esim. Fixus-ketju) ajanvarausjärjestelmään.\n\nAjanvarauksessa:\n- Valitset alkolukon asennuksen\n- Syötät postinumerosi\n- Näet lähimmät asennuspisteet\n- Valitset sinulle sopivan ajan kalenterista\n\nKun asennusaika on varattu, saamme siitä automaattisesti tiedon ja toimitamme alkolukon valittuun asennuspisteeseen."
+                            },
+                            {
+                                number: "!",
+                                title: "HUOMIOITAVAA",
+                                content: "Valvottu ajo-oikeus alkaa, kun poliisi luovuttaa sinulle väliaikaisen ajokortin.\n\nTuomioistuin vahvistaa myöhemmin valvotun ajo-oikeuden osaksi tuomiota ja päättää sen keston.\n\nMikäli tavoitteena on päästä mahdollisimman nopeasti takaisin autoilemaan, suosittelemme pyytämään valvottua ajo-oikeutta poliisilta heti tapahtuman jälkeen.\n\nTällöin väliaikainen alkolukkoajokortti voidaan myöntää jopa muutamassa päivässä.\n\nVäliaikainen alkolukkoajokortti oikeuttaa kuljettamaan hyväksytyllä alkolukolla varustettua ajoneuvoa.\n\n💡 Tarvittaessa Breatech Finland Oy auttaa sinua prosessin eri vaiheissa ja vastaa kysymyksiisi alkolukon vuokraukseen ja asennukseen liittyen."
+                            }
+                        ].map((step, index) => (
                             <div
-                                key={step.number}
+                                key={index}
                                 ref={el => stepsRef.current[index] = el}
                                 className="step"
                             >
@@ -114,7 +117,12 @@ const GuidedProcess = () => {
                                 </div>
                                 <div className="step-content">
                                     <h3>{step.title}</h3>
-                                    <p>{step.content}</p>
+                                    {step.question && <h4 className="step-question">{step.question}</h4>}
+                                    <div className="step-text">
+                                        {step.content.split('\n\n').map((paragraph, i) => (
+                                            <p key={i}>{paragraph}</p>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -228,11 +236,23 @@ const GuidedProcess = () => {
                     margin-bottom: 16px;
                 }
 
-                .step-content p {
+                .step-question {
+                    font-size: 1.4rem;
+                    color: #ff6b00;
+                    margin-bottom: 20px;
+                    line-height: 1.4;
+                    font-weight: 600;
+                }
+
+                .step-text p {
                     font-size: 1.1rem;
                     line-height: 1.8;
                     color: #cccccc;
-                    margin: 0;
+                    margin-bottom: 16px;
+                }
+
+                .step-text p:last-child {
+                    margin-bottom: 0;
                 }
 
                 @media (max-width: 768px) {
