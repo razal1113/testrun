@@ -18,8 +18,10 @@ const Hero = () => {
         <p>Breatech Finland tarjoaa hyväksytyt alkolukot sekä asiantuntevaa tukea<br />
           alkolukkoajokortin hankintaan Suomessa.</p>
 
-        <a href="#ota-yhteytta" className="cta-button">Ota yhteyttä</a>
-        <a href="#varaa-asennus" className="cta-button" style={{ marginLeft: '16px' }}>Varaa asennus</a>
+        <div className="cta-container">
+          <a href="#ota-yhteytta" className="cta-button">Ota yhteyttä</a>
+          <a href="#varaa-asennus" className="cta-button">Varaa asennus</a>
+        </div>
       </div>
 
       <style>{`
@@ -111,6 +113,14 @@ const Hero = () => {
           transform: translateY(-1px); /* Micro lift */
           /* No pulsing or glowing */
         }
+
+        .cta-container {
+          display: block;
+        }
+
+        .cta-button + .cta-button {
+          margin-left: 16px;
+        }
         
         @media (max-width: 768px) {
            .hero-content h1 {
@@ -118,6 +128,23 @@ const Hero = () => {
            }
            .hero-content p {
              font-size: 1.1rem;
+           }
+
+           .cta-container {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             gap: 16px;
+             width: 100%;
+           }
+
+           .cta-button {
+             width: 100%;
+             max-width: 300px; /* Nice max width for mobile */
+             margin: 0 !important; /* Override desktop margin */
+             display: flex;
+             justify-content: center;
+             align-items: center;
            }
         }
       `}</style>
