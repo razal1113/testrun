@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import heroBg from '../assets/hero-new.jpg';
+import heroBg from '../assets/hero-bg-2.jpg';
 
 const Hero = () => {
   const [loaded, setLoaded] = useState(false);
@@ -19,6 +19,7 @@ const Hero = () => {
           alkolukkoajokortin hankintaan Suomessa.</p>
 
         <a href="#ota-yhteytta" className="cta-button">Ota yhteyttä</a>
+        <a href="#varaa-asennus" className="cta-button" style={{ marginLeft: '16px' }}>Varaa asennus</a>
       </div>
 
       <style>{`

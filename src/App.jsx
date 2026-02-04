@@ -55,7 +55,7 @@ function App() {
 
       {/* Footer */}
       <footer style={{ padding: '40px', textAlign: 'center', opacity: 0.6, fontSize: '0.9rem', backgroundColor: '#0a0a0a' }}>
-        <p>&copy; 2026 Alkolukko-palvelu. Kaikki oikeudet pidätetään.</p>
+        <p>&copy; 2026 Breatech Finland Oy. Kaikki oikeudet pidätetään.</p>
       </footer>
     </div>
   );

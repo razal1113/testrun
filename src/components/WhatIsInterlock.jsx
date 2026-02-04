@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import vwBg from '../assets/vw-alkolukko.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -30,7 +31,8 @@ const WhatIsInterlock = () => {
 
     return (
         <section ref={sectionRef} id="mika-on-alkolukko" className="what-is-interlock">
-            <div className="container">
+            <div className="wii-overlay"></div>
+            <div className="container" style={{ position: 'relative', zIndex: 2 }}>
                 <h2 className="wii-heading">Mikä on alkolukko</h2>
                 <div ref={contentRef} className="wii-content">
                     <p>
@@ -48,8 +50,21 @@ const WhatIsInterlock = () => {
 
             <style>{`
                 .what-is-interlock {
-                    background-color: #0a0a0a;
+                    position: relative;
+                    background-image: url(${vwBg});
+                    background-size: cover;
+                    background-position: center;
                     padding: 100px 20px;
+                }
+
+                .wii-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(10, 10, 10, 0.7); /* Dark overlay for readability */
+                    z-index: 1;
                 }
 
                 .wii-heading {
@@ -68,7 +83,7 @@ const WhatIsInterlock = () => {
                 .wii-content p {
                     font-size: 1.2rem;
                     line-height: 1.9;
-                    color: #cccccc;
+                    color: #e0e0e0; /* Slightly lighter for better contrast on image */
                     margin-bottom: 30px;
                 }
 

@@ -81,14 +81,12 @@ const GuidedProcess = () => {
                         {[
                             {
                                 number: 1,
-                                title: "KYSYMYS",
-                                question: "Oletko pyytänyt tai saanut poliisilta luvan valvottuun ajo-oikeuteen?",
+                                title: "Oletko pyytänyt tai saanut poliisilta luvan valvottuun ajo-oikeuteen?",
                                 content: "Valvottua ajo-oikeutta kannattaa pyytää poliisilta heti tai viimeistään rattijuopumusasian käsittelyn yhteydessä tuomioistuimelta.\n\nSuosittelemme varmistamaan poliisilta, että sinulla on mahdollisuus saada alkolukkoajokortti.\n\nPoliisi antaa tarvittaessa lisätietoja alkolukkoajokortin hakemisesta ja siihen liittyvistä vaatimuksista."
                             },
                             {
                                 number: 2,
-                                title: "KYSYMYS",
-                                question: "Oletko käynyt lääkärin tai muun terveydenhuollon ammattihenkilön kanssa keskustelun päihteiden käytöstä ja saanut siitä todistuksen?",
+                                title: "Oletko käynyt lääkärin tai muun terveydenhuollon ammattihenkilön kanssa keskustelun päihteiden käytöstä ja saanut siitä todistuksen?",
                                 content: "Hanki todistus lääkärin tai muun terveydenhuollon ammattihenkilön kanssa käydystä keskustelusta (päihteiden käyttö).\n\nTodistus liitetään ajokorttihakemukseen ja toimitetaan poliisille.\n\nKun toimitat kaikki tarvittavat dokumentit poliisille, poliisi voi myöntää sinulle väliaikaisen ajokortin."
                             },
                             {
@@ -99,7 +97,7 @@ const GuidedProcess = () => {
                             {
                                 number: 4,
                                 title: "Varaa alkolukon asennus ja auton muutoskatsastus",
-                                content: "Kun painat ”Varaa asennus”, sinut ohjataan suoraan yhteistyökumppanimme (esim. Fixus-ketju) ajanvarausjärjestelmään.\n\nAjanvarauksessa:\n- Valitset alkolukon asennuksen\n- Syötät postinumerosi\n- Näet lähimmät asennuspisteet\n- Valitset sinulle sopivan ajan kalenterista\n\nKun asennusaika on varattu, saamme siitä automaattisesti tiedon ja toimitamme alkolukon valittuun asennuspisteeseen."
+                                content: "Kun painat ”Varaa asennus”, sinut ohjataan suoraan yhteistyökumppanimme ajanvarausjärjestelmään.\n\nAjanvarauksessa:\n- Valitset alkolukon asennuksen\n- Syötät postinumerosi\n- Näet lähimmät asennuspisteet\n- Valitset sinulle sopivan ajan kalenterista\n\nKun asennusaika on varattu, saamme siitä automaattisesti tiedon ja toimitamme alkolukon valittuun asennuspisteeseen."
                             },
                             {
                                 number: "!",
