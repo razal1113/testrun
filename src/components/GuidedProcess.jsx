@@ -2,57 +2,10 @@ import React, { useState, useRef } from 'react';
 import { gsap } from 'gsap';
 
 const GuidedProcess = () => {
-    // Correct Behavior Structure: Initial state MUST be currentStep = 1
-    const [currentStep, setCurrentStep] = useState(1);
-    const [showExplanation, setShowExplanation] = useState(false);
-    const [formSubmitted, setFormSubmitted] = useState(false);
+    // State-based flow: 'step1', 'form', 'confirmation', 'final-message'
+    const [currentState, setCurrentState] = useState('step1');
 
     const contentRef = useRef(null);
-
-    const steps = [
-        {
-            question: "Oletko pyytänyt tai saanut poliisilta luvan valvottuun ajo-oikeuteen?",
-            explanation: `Valvottua ajo-oikeutta kannattaa pyytää poliisilta heti tai viimeistään rattijuopumusasian käsittelyn yhteydessä tuomioistuimelta.
-
-            Suosittelemme varmistamaan poliisilta, että sinulla on mahdollisuus saada alkolukkoajokortti.
-
-            Poliisi antaa tarvittaessa lisätietoja alkolukkoajokortin hakemisesta ja siihen liittyvistä vaatimuksista.`
-        },
-        {
-            question: "Oletko käynyt lääkärin tai muun terveydenhuollon ammattihenkilön kanssa keskustelun päihteiden käytöstä ja saanut siitä todistuksen?",
-            explanation: `Hanki todistus lääkärin tai muun terveydenhuollon ammattihenkilön kanssa käydystä keskustelusta (päihteiden käyttö).
-            Todistus liitetään ajokorttihakemukseen ja toimitetaan poliisille.
-
-            Kun toimitat kaikki tarvittavat dokumentit poliisille, poliisi voi myöntää sinulle väliaikaisen ajokortin.`
-        },
-        {
-            question: "Oletko valmis vuokraamaan alkolukon?",
-            explanation: `Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.
-
-            Sopimuksen täyttämisen jälkeen allekirjoitat sopimuksen sähköisesti.
-            Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.
-
-            Vuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.
-
-            Mikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.
-
-            Mikäli luottotiedot eivät ole kunnossa, vuokrasopimus edellyttää takaajaa.
-
-            Vuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen.`
-        },
-        {
-            question: "Oletko valmis varaamaan asennusajan?",
-            explanation: `Kun painat ”Varaa asennus”, sinut ohjataan ajanvarausjärjestelmään.
-
-            Ajanvarauksessa:
-            - Valitset alkolukon asennuksen
-            - Syötät postinumerosi
-            - Näet lähimmät asennuspisteet
-            - Valitset sinulle sopivan ajan kalenterista
-
-            Kun asennusaika on varattu, toimitamme alkolukon valittuun asennuspisteeseen.`
-        }
-    ];
 
     const [formData, setFormData] = useState({
         nimi: '',
@@ -64,22 +17,13 @@ const GuidedProcess = () => {
         rekisterinumero: ''
     });
 
-    const handleAnswer = () => {
-        setShowExplanation(true);
-        gsap.fromTo(".explanation-container",
-            { opacity: 0, y: 10 },
-            { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
-        );
-    };
-
-    const handleNext = () => {
+    const handleJatka = () => {
         gsap.to(contentRef.current, {
             opacity: 0,
             y: -10,
             duration: 0.3,
             onComplete: () => {
-                setCurrentStep(prev => prev + 1);
-                setShowExplanation(false);
+                setCurrentState('form');
                 gsap.fromTo(contentRef.current,
                     { opacity: 0, y: 10 },
                     { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
@@ -95,7 +39,26 @@ const GuidedProcess = () => {
             y: -10,
             duration: 0.3,
             onComplete: () => {
-                setFormSubmitted(true);
+                setCurrentState('confirmation');
+                gsap.fromTo(contentRef.current,
+                    { opacity: 0, y: 10 },
+                    { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+                );
+            }
+        });
+    };
+
+    const handleYes = () => {
+        window.location.href = 'https://fixushuolto.fi/eox/huolto';
+    };
+
+    const handleNo = () => {
+        gsap.to(contentRef.current, {
+            opacity: 0,
+            y: -10,
+            duration: 0.3,
+            onComplete: () => {
+                setCurrentState('final-message');
                 gsap.fromTo(contentRef.current,
                     { opacity: 0, y: 10 },
                     { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
@@ -120,37 +83,25 @@ const GuidedProcess = () => {
                 </p>
 
                 <div className="interactive-container" ref={contentRef}>
-                    {formSubmitted ? (
-                        <div className="success-box">
-                            <h3 className="success-heading">Kiitos. Olemme sinuun yhteydessä mahdollisimman pian.</h3>
-                        </div>
-                    ) : currentStep <= steps.length ? (
+                    {currentState === 'step1' && (
                         <div className="step-box">
-                            <h3 className="question-text">{steps[currentStep - 1].question}</h3>
-
-                            {!showExplanation && (
-                                <div className="button-group">
-                                    <button className="choice-btn" onClick={handleAnswer}>Kyllä</button>
-                                    <button className="choice-btn" onClick={handleAnswer}>Ei</button>
-                                </div>
-                            )}
-
-                            {showExplanation && (
-                                <div className="explanation-container">
-                                    <div className="explanation-text">
-                                        {steps[currentStep - 1].explanation.split('\n').map((line, i) => (
-                                            <p key={i}>{line.trim()}</p>
-                                        ))}
-                                    </div>
-                                    <button className="next-btn" onClick={handleNext}>Jatka</button>
-                                </div>
-                            )}
+                            <h3 className="question-text">Oletko valmis vuokraamaan alkolukon?</h3>
+                            <div className="explanation-text">
+                                <p>Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.</p>
+                                <p>Sopimuksen täyttämisen jälkeen allekirjoitat sopimuksen sähköisesti.</p>
+                                <p>Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.</p>
+                                <p>Vuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.</p>
+                                <p>Mikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.</p>
+                                <p>Mikäli luottotiedot eivät ole kunnossa, vuokrasopimus edellyttää takaajaa.</p>
+                                <p>Vuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen.</p>
+                            </div>
+                            <button className="next-btn" onClick={handleJatka}>Jatka</button>
                         </div>
-                    ) : (
-                        <div className="form-box">
-                            <h3 className="form-heading">Tarvitsetko apua? Täytä tiedot ja olemme sinuun yhteydessä.</h3>
-                            <p className="form-subtext">Voit myös varata asennuksen tai kysyä lisätietoja alkolukon vuokrauksesta.</p>
+                    )}
 
+                    {currentState === 'form' && (
+                        <div className="step-box">
+                            <h3 className="form-section-heading">VUOKRANOTTAJA</h3>
                             <form className="guided-form" onSubmit={handleFormSubmit}>
                                 <div className="form-grid">
                                     <div className="form-group">
@@ -182,8 +133,24 @@ const GuidedProcess = () => {
                                         <input type="text" name="rekisterinumero" value={formData.rekisterinumero} onChange={handleFormChange} required />
                                     </div>
                                 </div>
-                                <button type="submit" className="submit-btn" id="submit-btn-logic-fix">Lähetä tiedot</button>
+                                <button type="submit" className="submit-btn">Lähetä</button>
                             </form>
+                        </div>
+                    )}
+
+                    {currentState === 'confirmation' && (
+                        <div className="step-box">
+                            <h3 className="question-text">Haluatko varata asennusajan nyt?</h3>
+                            <div className="button-group">
+                                <button className="choice-btn" onClick={handleYes}>Kyllä</button>
+                                <button className="choice-btn" onClick={handleNo}>Ei</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {currentState === 'final-message' && (
+                        <div className="success-box">
+                            <h3 className="success-heading">Kiitos. Olemme sinuun yhteydessä mahdollisimman pian.</h3>
                         </div>
                     )}
                 </div>
@@ -214,7 +181,7 @@ const GuidedProcess = () => {
                     margin: 0 auto;
                     min-height: 450px;
                 }
-                .step-box, .form-box, .success-box {
+                .step-box, .success-box {
                     background: #1a1a1a;
                     padding: 40px;
                     border-radius: 20px;
@@ -223,33 +190,8 @@ const GuidedProcess = () => {
                 .question-text {
                     font-size: 1.8rem;
                     font-weight: 600;
-                    margin-bottom: 40px;
+                    margin-bottom: 30px;
                     line-height: 1.4;
-                }
-                .button-group {
-                    display: flex;
-                    gap: 20px;
-                    margin-bottom: 40px;
-                }
-                .choice-btn {
-                    flex: 1;
-                    padding: 16px;
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    border-radius: 12px;
-                    border: 1px solid #444;
-                    background: transparent;
-                    color: #fff;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                }
-                .choice-btn:hover {
-                    border-color: #ff6b00;
-                    background: rgba(255, 107, 0, 0.1);
-                }
-                .explanation-container {
-                    border-top: 1px solid #333;
-                    padding-top: 40px;
                 }
                 .explanation-text {
                     margin-bottom: 30px;
@@ -260,29 +202,35 @@ const GuidedProcess = () => {
                     font-size: 1.1rem;
                     margin-bottom: 16px;
                 }
-                .next-btn, .submit-btn {
-                    background: #ff6b00;
+                .next-btn, .submit-btn, .choice-btn {
+                    background: var(--color-accent-orange) !important;
                     color: #fff;
                     border: none;
                     padding: 16px 40px;
                     font-size: 1.1rem;
                     font-weight: 600;
-                    border-radius: 12px;
+                    border-radius: 50px;
                     cursor: pointer;
-                    transition: all 0.2s ease;
+                    transition: all 0.3s ease;
+                    display: block;
+                    margin: 0 auto;
+                    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
                 }
-                .next-btn:hover, .submit-btn:hover {
-                    background: #ff8c3a;
+                .next-btn:hover, .submit-btn:hover, .choice-btn:hover {
+                    background: var(--color-accent-orange-hover) !important;
                     transform: translateY(-2px);
+                    box-shadow: 0 6px 25px rgba(255, 107, 0, 0.5);
                 }
-                .form-heading {
-                    font-size: 1.8rem;
-                    margin-bottom: 12px;
+                .choice-btn {
+                    flex: 1;
+                    margin: 0;
                 }
-                .form-subtext {
-                    color: #ccc;
-                    margin-bottom: 40px;
-                    font-size: 1.1rem;
+                .form-section-heading {
+                    font-size: 1.4rem;
+                    font-weight: 600;
+                    margin-bottom: 30px;
+                    color: var(--color-accent-orange);
+                    letter-spacing: 0.5px;
                 }
                 .form-grid {
                     display: flex;
@@ -311,11 +259,16 @@ const GuidedProcess = () => {
                 }
                 .form-group input:focus {
                     outline: none;
-                    border-color: #ff6b00;
+                    border-color: var(--color-accent-orange);
                     box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
                 }
                 .submit-btn {
                     width: 100%;
+                }
+                .button-group {
+                    display: flex;
+                    gap: 20px;
+                    margin-top: 20px;
                 }
                 .success-box {
                     text-align: center;
@@ -327,7 +280,7 @@ const GuidedProcess = () => {
                 }
 
                 @media (max-width: 768px) {
-                    .step-box, .form-box {
+                    .step-box {
                         padding: 30px 20px;
                     }
                     .question-text {

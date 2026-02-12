@@ -108,7 +108,7 @@ const Hero = () => {
         }
 
         .cta-button:hover {
-          filter: brightness(1.08); /* Slight brightness increase */
+          background-color: var(--color-accent-orange-hover);
           transform: translateY(-1px); /* Micro lift */
           /* No pulsing or glowing */
         }

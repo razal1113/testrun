@@ -178,7 +178,7 @@ const ContactSection = () => {
                 .form-group input:focus,
                 .form-group textarea:focus {
                     outline: none;
-                    border-color: #ff6b00;
+                    border-color: var(--color-accent-orange);
                     box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
                 }
 
@@ -192,7 +192,7 @@ const ContactSection = () => {
                     padding: 16px;
                     font-size: 1.1rem;
                     font-weight: 600;
-                    background-color: #ff6b00;
+                    background-color: var(--color-accent-orange);
                     color: #ffffff;
                     border: none;
                     border-radius: 8px;
@@ -201,7 +201,7 @@ const ContactSection = () => {
                 }
 
                 .submit-button:hover {
-                    background-color: #ff8c3a;
+                    background-color: var(--color-accent-orange-hover);
                     transform: translateY(-2px) scale(1.02);
                     box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
                 }

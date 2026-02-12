@@ -127,8 +127,7 @@ const Navbar = () => {
         }
         
         .nav-item.contact-btn:hover {
-          background: var(--color-accent-orange);
-          filter: brightness(1.08);
+          background: var(--color-accent-orange-hover);
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
         }
