@@ -82,8 +82,13 @@ const ProductSection = () => {
                             loop
                             muted
                             playsInline
+                            controls
+                            style={{ minWidth: "300px", minHeight: "300px", backgroundColor: "rgba(255,0,0,0.1)" }}
+                            onLoadedData={() => console.log("Video loaded successfully")}
+                            onError={(e) => console.error("Video error:", e)}
                         >
                             <source src={breatechDevice} type="video/webm" />
+                            Your browser does not support the video tag.
                         </video>
                         <div className="shadow-effect"></div>
                     </div>
