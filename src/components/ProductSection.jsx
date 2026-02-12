@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+// import breatechDevice from '../assets/breatech-device.png';
+import breatechDevice from '../assets/logo.png'; // TESTING
 
 gsap.registerPlugin(ScrollTrigger);
 
