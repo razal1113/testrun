@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import breatechDevice from '../assets/breatech-device.webm';
+import breatechDevice from '../assets/breatech-device.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -75,21 +75,12 @@ const ProductSection = () => {
                     {/* LEFT COLUMN: Product Highlight */}
                     <div className="product-image-col">
                         <div className="glow-effect"></div>
-                        <video
+                        <img
                             ref={imageRef}
+                            src={breatechDevice}
+                            alt="Breatech B1000 Alkolukko"
                             className="product-image"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            controls
-                            style={{ minWidth: "300px", minHeight: "300px", backgroundColor: "rgba(255,0,0,0.1)" }}
-                            onLoadedData={() => console.log("Video loaded successfully")}
-                            onError={(e) => console.error("Video error:", e)}
-                        >
-                            <source src={breatechDevice} type="video/webm" />
-                            Your browser does not support the video tag.
-                        </video>
+                        />
                         <div className="shadow-effect"></div>
                     </div>
 
