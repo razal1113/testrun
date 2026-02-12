@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-// import breatechDevice from '../assets/breatech-device.png';
-import breatechDevice from '../assets/logo.png'; // TESTING
+import breatechDevice from '../assets/breatech-device.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,27 +11,26 @@ const ProductSection = () => {
     const contentRef = useRef(null);
 
     useEffect(() => {
-        console.log("Image path:", breatechDevice);
         const section = sectionRef.current;
         const image = imageRef.current;
         const content = contentRef.current;
 
         // Animate image
-        // gsap.fromTo(image,
-        //     { opacity: 0, x: -50 },
-        //     {
-        //         opacity: 1,
-        //         x: 0,
-        //         duration: 1.2,
-        //         ease: 'power3.out',
-        //         scrollTrigger: {
-        //             trigger: section,
-        //             start: 'top 70%',
-        //             end: 'bottom bottom',
-        //             toggleActions: 'play none none reverse'
-        //         }
-        //     }
-        // );
+        gsap.fromTo(image,
+            { opacity: 0, x: -50 },
+            {
+                opacity: 1,
+                x: 0,
+                duration: 1.2,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top 70%',
+                    end: 'bottom bottom',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
 
         // Animate content
         gsap.fromTo(content,
