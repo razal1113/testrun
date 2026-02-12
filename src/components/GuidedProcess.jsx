@@ -17,7 +17,14 @@ const GuidedProcess = () => {
         rekisterinumero: ''
     });
 
+    const scrollToTop = () => {
+        if (contentRef.current) {
+            contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
     const handleJatka = () => {
+        scrollToTop();
         gsap.to(contentRef.current, {
             opacity: 0,
             y: -10,
@@ -34,6 +41,7 @@ const GuidedProcess = () => {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        scrollToTop();
         gsap.to(contentRef.current, {
             opacity: 0,
             y: -10,
@@ -53,6 +61,7 @@ const GuidedProcess = () => {
     };
 
     const handleNo = () => {
+        scrollToTop();
         gsap.to(contentRef.current, {
             opacity: 0,
             y: -10,
@@ -179,7 +188,8 @@ const GuidedProcess = () => {
                 .interactive-container {
                     max-width: 800px;
                     margin: 0 auto;
-                    min-height: 450px;
+                    min-height: 480px; /* Increased slightly for stability */
+                    overflow-anchor: none; /* Prevent scroll anchoring jumps */
                 }
                 .step-box, .success-box {
                     background: #1a1a1a;
@@ -254,7 +264,8 @@ const GuidedProcess = () => {
                     padding: 14px 18px;
                     border-radius: 12px;
                     color: #fff;
-                    font-size: 1rem;
+                    color: #fff;
+                    font-size: 16px; /* Prevent iOS zoom */
                     transition: all 0.2s ease;
                 }
                 .form-group input:focus {
