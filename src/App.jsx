@@ -8,6 +8,7 @@ import GuidedProcess from './components/GuidedProcess';
 import WhatIsInterlock from './components/WhatIsInterlock';
 import ImportantInfo from './components/ImportantInfo';
 import ContactSection from './components/ContactSection';
+import ProductSection from './components/ProductSection';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -51,6 +52,7 @@ function App() {
       <GuidedProcess />
       <WhatIsInterlock />
       <ImportantInfo />
+      <ProductSection />
       <ContactSection />
 
       {/* Footer */}
