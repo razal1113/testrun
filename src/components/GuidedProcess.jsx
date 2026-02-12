@@ -15,7 +15,8 @@ const STEPS = [
                 <p>Poliisi antaa tarvittaessa lisätietoja alkolukkoajokortin hakemisesta ja siihen liittyvistä vaatimuksista.</p>
             </>
         ),
-        buttonText: "Kyllä"
+        buttonText: "Kyllä",
+        noButtonText: "Ei"
     },
     {
         id: 2,
@@ -27,27 +28,11 @@ const STEPS = [
                 <p>Kun toimitat kaikki tarvittavat dokumentit poliisille, poliisi voi myöntää sinulle väliaikaisen ajokortin.</p>
             </>
         ),
-        buttonText: "Kyllä"
+        buttonText: "Kyllä",
+        noButtonText: "Ei"
     },
     {
         id: 3,
-        question: "Oletko valmis vuokraamaan alkolukon?",
-        answer: (
-            <>
-                <p>Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.</p>
-                <p>Sopimuksen täyttämisen jälkeen allekirjoitat sopimuksen ”Allekirjoita”-painikkeen kautta sähköisesti.</p>
-                <p>Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.</p>
-                <p>Vuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.</p>
-                <p>Mikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.</p>
-                <p>Mikäli luottotiedot eivät ole kunnossa, saat ilmoituksen, että vuokrasopimus edellyttää takaajaa.</p>
-                <p>Tällöin voit syöttää takaajan tiedot suoraan vuokrasopimukseen ja lähettää takaajalle linkin sähköistä allekirjoitusta varten.</p>
-                <p>Vuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen.</p>
-            </>
-        ),
-        buttonText: "Kyllä"
-    },
-    {
-        id: 4,
         question: "Oletko valmis varaamaan asennusajan ja auton muutoskatsastuksen?",
         answer: (
             <>
@@ -62,7 +47,26 @@ const STEPS = [
                 <p>Kun asennusaika on varattu, saamme siitä automaattisesti tiedon ja toimitamme alkolukon valittuun asennuspisteeseen.</p>
             </>
         ),
-        buttonText: "Kyllä"
+        buttonText: "Kyllä",
+        noButtonText: "Ei"
+    },
+    {
+        id: 4,
+        question: "Oletko valmis vuokraamaan alkolukon?",
+        answer: (
+            <>
+                <p>Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.</p>
+                <p>Sopimuksen täyttämisen jälkeen allekirjoitat sopimuksen ”Allekirjoita”-painikkeen kautta sähköisesti.</p>
+                <p>Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.</p>
+                <p>Vuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.</p>
+                <p>Mikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.</p>
+                <p>Mikäli luottotiedot eivät ole kunnossa, saat ilmoituksen, että vuokrasopimus edellyttää takaajaa.</p>
+                <p>Tällöin voit syöttää takaajan tiedot suoraan vuokrasopimukseen ja lähettää takaajalle linkin sähköistä allekirjoitusta varten.</p>
+                <p>Vuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen.</p>
+            </>
+        ),
+        buttonText: "Kyllä",
+        noButtonText: "Ei"
     }
 ];
 
@@ -79,6 +83,7 @@ const GuidedProcess = () => {
 
     const stepRefs = useRef([]);
     const formRef = useRef(null);
+    const containerRef = useRef(null);
 
     const [formData, setFormData] = useState({
         nimi: '',
@@ -98,6 +103,29 @@ const GuidedProcess = () => {
             { height: 0, opacity: 0 },
             { height: 'auto', opacity: 1, duration: 0.5, ease: 'power2.out' }
         );
+    };
+
+    const handleReset = () => {
+        // Clear all state to start over
+        setActiveStepIndex(0);
+        setRevealedSteps(new Set());
+        setCompletedSteps(new Set());
+        setShowForm(false);
+        setFormSubmitted(false);
+        setFormData({
+            nimi: '',
+            osoite: '',
+            postinumero: '',
+            tunnus: '',
+            puhelin: '',
+            sahkoposti: '',
+            rekisterinumero: ''
+        });
+
+        // Scroll to top of container
+        if (containerRef.current) {
+            containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     };
 
     const handleNextStep = (index) => {
@@ -155,14 +183,12 @@ const GuidedProcess = () => {
         window.location.href = 'https://fixushuolto.fi/eox/huolto';
     };
 
-    // No action needed for No, simpler message
-    const [finalMessageVisible, setFinalMessageVisible] = useState(false);
     const handleFinalNo = () => {
-        setFinalMessageVisible(true);
+        handleReset();
     };
 
     return (
-        <section id="ohjattu-prosessi" className="guided-process">
+        <section id="ohjattu-prosessi" className="guided-process" ref={containerRef}>
             <div className="container">
                 <h2 className="gp-heading">Ajokortin saamiseen tarvittavat toimenpiteet</h2>
                 <p className="gp-intro">
@@ -186,9 +212,14 @@ const GuidedProcess = () => {
                                 <h3 className="question-text">{step.question}</h3>
 
                                 {!isRevealed && !isCompleted && (
-                                    <button className="action-btn" onClick={() => handleReveal(index)}>
-                                        {step.buttonText}
-                                    </button>
+                                    <div className="button-group-step">
+                                        <button className="action-btn" onClick={() => handleReveal(index)}>
+                                            {step.buttonText}
+                                        </button>
+                                        <button className="action-btn secondary-btn" onClick={handleReset}>
+                                            {step.noButtonText}
+                                        </button>
+                                    </div>
                                 )}
 
                                 <div className="step-answer" style={{ display: isRevealed ? 'block' : 'none', opacity: isRevealed ? 1 : 0 }}>
@@ -247,19 +278,11 @@ const GuidedProcess = () => {
 
                 {formSubmitted && (
                     <div id="confirmation-area" className="confirmation-box">
-                        {!finalMessageVisible ? (
-                            <>
-                                <h3 className="question-text">Haluatko siirtyä varaamaan asennusajan nyt?</h3>
-                                <div className="button-group">
-                                    <button className="action-btn choice-btn" onClick={handleFinalYes}>Kyllä</button>
-                                    <button className="action-btn choice-btn" onClick={handleFinalNo}>Ei</button>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="final-message">
-                                <h3 className="success-heading">Kiitos. Olemme sinuun yhteydessä mahdollisimman pian.</h3>
-                            </div>
-                        )}
+                        <h3 className="question-text">Haluatko siirtyä varaamaan asennusajan nyt?</h3>
+                        <div className="button-group">
+                            <button className="action-btn choice-btn" onClick={handleFinalYes}>Kyllä</button>
+                            <button className="action-btn choice-btn" onClick={handleFinalNo}>Ei</button>
+                        </div>
                     </div>
                 )}
             </div>
@@ -325,6 +348,11 @@ const GuidedProcess = () => {
                     margin-bottom: 12px;
                 }
 
+                .button-group-step {
+                    display: flex;
+                    gap: 16px;
+                }
+
                 .action-btn {
                     background: var(--color-accent-orange);
                     color: #fff;
@@ -343,6 +371,17 @@ const GuidedProcess = () => {
                     transform: translateY(-2px);
                     box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
                 }
+                .secondary-btn {
+                    background: transparent;
+                    border: 1px solid #444;
+                    box-shadow: none;
+                }
+                .secondary-btn:hover {
+                    background: rgba(255,255,255,0.1);
+                    border-color: #666;
+                    box-shadow: none;
+                }
+
                 .continue-btn {
                     margin-top: 10px;
                 }
