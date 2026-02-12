@@ -19,7 +19,6 @@ const Hero = () => {
           alkolukkoajokortin hankintaan Suomessa.</p>
 
         <div className="cta-container">
-          <a href="#ota-yhteytta" className="cta-button">Ota yhteyttä</a>
           <a href="#varaa-asennus" className="cta-button">Varaa asennus</a>
         </div>
       </div>
@@ -115,11 +114,8 @@ const Hero = () => {
         }
 
         .cta-container {
-          display: block;
-        }
-
-        .cta-button + .cta-button {
-          margin-left: 16px;
+          display: flex;
+          justify-content: center;
         }
         
         @media (max-width: 768px) {

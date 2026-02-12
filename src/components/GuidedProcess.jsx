@@ -1,132 +1,191 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const GuidedProcess = () => {
-    const timelineRef = useRef(null);
-    const stepsRef = useRef([]);
+    // Correct Behavior Structure: Initial state MUST be currentStep = 1
+    const [currentStep, setCurrentStep] = useState(1);
+    const [showExplanation, setShowExplanation] = useState(false);
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
+    const contentRef = useRef(null);
 
+    const steps = [
+        {
+            question: "Oletko pyytänyt tai saanut poliisilta luvan valvottuun ajo-oikeuteen?",
+            explanation: `Valvottua ajo-oikeutta kannattaa pyytää poliisilta heti tai viimeistään rattijuopumusasian käsittelyn yhteydessä tuomioistuimelta.
 
-    useEffect(() => {
-        // Create timeline line growth animation
-        gsap.to(timelineRef.current, {
-            scrollTrigger: {
-                trigger: '.guided-process',
-                start: 'top center',
-                end: 'bottom center',
-                scrub: 1,
-            },
-            scaleY: 1,
-            transformOrigin: 'top',
-            ease: 'none'
+            Suosittelemme varmistamaan poliisilta, että sinulla on mahdollisuus saada alkolukkoajokortti.
+
+            Poliisi antaa tarvittaessa lisätietoja alkolukkoajokortin hakemisesta ja siihen liittyvistä vaatimuksista.`
+        },
+        {
+            question: "Oletko käynyt lääkärin tai muun terveydenhuollon ammattihenkilön kanssa keskustelun päihteiden käytöstä ja saanut siitä todistuksen?",
+            explanation: `Hanki todistus lääkärin tai muun terveydenhuollon ammattihenkilön kanssa käydystä keskustelusta (päihteiden käyttö).
+            Todistus liitetään ajokorttihakemukseen ja toimitetaan poliisille.
+
+            Kun toimitat kaikki tarvittavat dokumentit poliisille, poliisi voi myöntää sinulle väliaikaisen ajokortin.`
+        },
+        {
+            question: "Oletko valmis vuokraamaan alkolukon?",
+            explanation: `Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.
+
+            Sopimuksen täyttämisen jälkeen allekirjoitat sopimuksen sähköisesti.
+            Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.
+
+            Vuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.
+
+            Mikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.
+
+            Mikäli luottotiedot eivät ole kunnossa, vuokrasopimus edellyttää takaajaa.
+
+            Vuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen.`
+        },
+        {
+            question: "Oletko valmis varaamaan asennusajan?",
+            explanation: `Kun painat ”Varaa asennus”, sinut ohjataan ajanvarausjärjestelmään.
+
+            Ajanvarauksessa:
+            - Valitset alkolukon asennuksen
+            - Syötät postinumerosi
+            - Näet lähimmät asennuspisteet
+            - Valitset sinulle sopivan ajan kalenterista
+
+            Kun asennusaika on varattu, toimitamme alkolukon valittuun asennuspisteeseen.`
+        }
+    ];
+
+    const [formData, setFormData] = useState({
+        nimi: '',
+        osoite: '',
+        postinumero: '',
+        tunnus: '',
+        puhelin: '',
+        sahkoposti: '',
+        rekisterinumero: ''
+    });
+
+    const handleAnswer = () => {
+        setShowExplanation(true);
+        gsap.fromTo(".explanation-container",
+            { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+        );
+    };
+
+    const handleNext = () => {
+        gsap.to(contentRef.current, {
+            opacity: 0,
+            y: -10,
+            duration: 0.3,
+            onComplete: () => {
+                setCurrentStep(prev => prev + 1);
+                setShowExplanation(false);
+                gsap.fromTo(contentRef.current,
+                    { opacity: 0, y: 10 },
+                    { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+                );
+            }
         });
+    };
 
-        // Animate each step
-        stepsRef.current.forEach((step, index) => {
-            if (!step) return;
-
-            gsap.fromTo(step,
-                {
-                    opacity: 0.3,
-                    x: -20
-                },
-                {
-                    scrollTrigger: {
-                        trigger: step,
-                        start: 'top 70%',
-                        end: 'top 30%',
-                        scrub: 1,
-                        onEnter: () => {
-                            step.classList.add('active');
-                        },
-                        onLeaveBack: () => {
-                            step.classList.remove('active');
-                        }
-                    },
-                    opacity: 1,
-                    x: 0,
-                    ease: 'power2.out'
-                }
-            );
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        gsap.to(contentRef.current, {
+            opacity: 0,
+            y: -10,
+            duration: 0.3,
+            onComplete: () => {
+                setFormSubmitted(true);
+                gsap.fromTo(contentRef.current,
+                    { opacity: 0, y: 10 },
+                    { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+                );
+            }
         });
+    };
 
-        return () => {
-            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-        };
-    }, []);
+    const handleFormChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
 
     return (
         <section id="ohjattu-prosessi" className="guided-process">
             <div className="container">
                 <h2 className="gp-heading">Ajokortin saamiseen tarvittavat toimenpiteet</h2>
                 <p className="gp-intro">
-                    Alla olevat vaiheet ohjaavat sinua askel askeleelta alkolukkoajokortin
-                    hakemisessa ja alkolukon vuokraamisessa.
+                    Alla olevat vaiheet ohjaavat sinua askel askeleelta alkolukkoajokortin hakemisessa ja alkolukon vuokraamisessa.
                 </p>
 
-                <div className="timeline-container">
-                    {/* Vertical timeline line */}
-                    <div className="timeline-track">
-                        <div
-                            ref={timelineRef}
-                            className="timeline-line"
-                        />
-                    </div>
+                <div className="interactive-container" ref={contentRef}>
+                    {formSubmitted ? (
+                        <div className="success-box">
+                            <h3 className="success-heading">Kiitos. Olemme sinuun yhteydessä mahdollisimman pian.</h3>
+                        </div>
+                    ) : currentStep <= steps.length ? (
+                        <div className="step-box">
+                            <h3 className="question-text">{steps[currentStep - 1].question}</h3>
 
-                    {/* Steps */}
-                    <div className="steps-container">
-                        {[
-                            {
-                                number: 1,
-                                title: "Oletko pyytänyt tai saanut poliisilta luvan valvottuun ajo-oikeuteen?",
-                                content: "Valvottua ajo-oikeutta kannattaa pyytää poliisilta heti tai viimeistään rattijuopumusasian käsittelyn yhteydessä tuomioistuimelta.\n\nSuosittelemme varmistamaan poliisilta, että sinulla on mahdollisuus saada alkolukkoajokortti.\n\nPoliisi antaa tarvittaessa lisätietoja alkolukkoajokortin hakemisesta ja siihen liittyvistä vaatimuksista."
-                            },
-                            {
-                                number: 2,
-                                title: "Oletko käynyt lääkärin tai muun terveydenhuollon ammattihenkilön kanssa keskustelun päihteiden käytöstä ja saanut siitä todistuksen?",
-                                content: "Hanki todistus lääkärin tai muun terveydenhuollon ammattihenkilön kanssa käydystä keskustelusta (päihteiden käyttö).\n\nTodistus liitetään ajokorttihakemukseen ja toimitetaan poliisille.\n\nKun toimitat kaikki tarvittavat dokumentit poliisille, poliisi voi myöntää sinulle väliaikaisen ajokortin."
-                            },
-                            {
-                                number: 3,
-                                title: "Vuokraa alkolukko",
-                                content: "Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.\n\nSopimuksen täyttämisen jälkeen allekirjoitat sopimuksen ”Allekirjoita”-painikkeen kautta sähköisesti. Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.\n\nVuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.\n\nMikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.\n\nMikäli luottotiedot eivät ole kunnossa, saat ilmoituksen, että vuokrasopimus edellyttää takaajaa.\n\nTällöin voit syöttää takaajan tiedot suoraan vuokrasopimukseen ja lähettää takaajalle linkin sähköistä allekirjoitusta varten.\n\nVuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen."
-                            },
-                            {
-                                number: 4,
-                                title: "Varaa alkolukon asennus ja auton muutoskatsastus",
-                                content: "Kun painat ”Varaa asennus”, sinut ohjataan suoraan yhteistyökumppanimme ajanvarausjärjestelmään.\n\nAjanvarauksessa:\n- Valitset alkolukon asennuksen\n- Syötät postinumerosi\n- Näet lähimmät asennuspisteet\n- Valitset sinulle sopivan ajan kalenterista\n\nKun asennusaika on varattu, saamme siitä automaattisesti tiedon ja toimitamme alkolukon valittuun asennuspisteeseen."
-                            },
-                            {
-                                number: "!",
-                                title: "HUOMIOITAVAA",
-                                content: "Valvottu ajo-oikeus alkaa, kun poliisi luovuttaa sinulle väliaikaisen ajokortin.\n\nTuomioistuin vahvistaa myöhemmin valvotun ajo-oikeuden osaksi tuomiota ja päättää sen keston.\n\nMikäli tavoitteena on päästä mahdollisimman nopeasti takaisin autoilemaan, suosittelemme pyytämään valvottua ajo-oikeutta poliisilta heti tapahtuman jälkeen.\n\nTällöin väliaikainen alkolukkoajokortti voidaan myöntää jopa muutamassa päivässä.\n\nVäliaikainen alkolukkoajokortti oikeuttaa kuljettamaan hyväksytyllä alkolukolla varustettua ajoneuvoa.\n\n💡 Tarvittaessa Breatech Finland Oy auttaa sinua prosessin eri vaiheissa ja vastaa kysymyksiisi alkolukon vuokraukseen ja asennukseen liittyen."
-                            }
-                        ].map((step, index) => (
-                            <div
-                                key={index}
-                                ref={el => stepsRef.current[index] = el}
-                                className="step"
-                            >
-                                <div className="step-marker">
-                                    <span>{step.number}</span>
+                            {!showExplanation && (
+                                <div className="button-group">
+                                    <button className="choice-btn" onClick={handleAnswer}>Kyllä</button>
+                                    <button className="choice-btn" onClick={handleAnswer}>Ei</button>
                                 </div>
-                                <div className="step-content">
-                                    <h3>{step.title}</h3>
-                                    {step.question && <h4 className="step-question">{step.question}</h4>}
-                                    <div className="step-text">
-                                        {step.content.split('\n\n').map((paragraph, i) => (
-                                            <p key={i} style={{ whiteSpace: 'pre-line', marginBottom: '16px' }}>
-                                                {paragraph}
-                                            </p>
+                            )}
+
+                            {showExplanation && (
+                                <div className="explanation-container">
+                                    <div className="explanation-text">
+                                        {steps[currentStep - 1].explanation.split('\n').map((line, i) => (
+                                            <p key={i}>{line.trim()}</p>
                                         ))}
                                     </div>
+                                    <button className="next-btn" onClick={handleNext}>Jatka</button>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="form-box">
+                            <h3 className="form-heading">Tarvitsetko apua? Täytä tiedot ja olemme sinuun yhteydessä.</h3>
+                            <p className="form-subtext">Voit myös varata asennuksen tai kysyä lisätietoja alkolukon vuokrauksesta.</p>
+
+                            <form className="guided-form" onSubmit={handleFormSubmit}>
+                                <div className="form-grid">
+                                    <div className="form-group">
+                                        <label>Nimi / Yritys</label>
+                                        <input type="text" name="nimi" value={formData.nimi} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Osoite</label>
+                                        <input type="text" name="osoite" value={formData.osoite} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Postinumero ja postitoimipaikka</label>
+                                        <input type="text" name="postinumero" value={formData.postinumero} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Henkilötunnus / Y-tunnus</label>
+                                        <input type="text" name="tunnus" value={formData.tunnus} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Puhelin</label>
+                                        <input type="tel" name="puhelin" value={formData.puhelin} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Sähköposti</label>
+                                        <input type="email" name="sahkoposti" value={formData.sahkoposti} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Ajoneuvon rekisteritunnus</label>
+                                        <input type="text" name="rekisterinumero" value={formData.rekisterinumero} onChange={handleFormChange} required />
+                                    </div>
+                                </div>
+                                <button type="submit" className="submit-btn" id="submit-btn-logic-fix">Lähetä tiedot</button>
+                            </form>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -134,166 +193,148 @@ const GuidedProcess = () => {
                 .guided-process {
                     background-color: #121212;
                     padding: 120px 20px;
-                    position: relative;
+                    color: #ffffff;
                 }
-
                 .gp-heading {
-                    font-size: 3rem;
+                    font-size: clamp(2rem, 5vw, 3rem);
                     font-weight: 700;
                     text-align: center;
                     margin-bottom: 24px;
-                    color: #ffffff;
                 }
-
                 .gp-intro {
                     text-align: center;
-                    max-width: 700px;
-                    margin: 0 auto 100px;
+                    max-width: 800px;
+                    margin: 0 auto 60px;
                     font-size: 1.2rem;
                     color: #cccccc;
-                    line-height: 1.7;
+                    line-height: 1.6;
                 }
-
-                .timeline-container {
-                    position: relative;
-                    max-width: 900px;
+                .interactive-container {
+                    max-width: 800px;
                     margin: 0 auto;
+                    min-height: 450px;
                 }
-
-                .timeline-track {
-                    position: absolute;
-                    left: 30px;
-                    top: 0;
-                    bottom: 0;
-                    width: 4px;
-                    background-color: #2a2a2a;
-                    border-radius: 2px;
-                    overflow: hidden;
+                .step-box, .form-box, .success-box {
+                    background: #1a1a1a;
+                    padding: 40px;
+                    border-radius: 20px;
+                    border: 1px solid #333;
                 }
-
-                .timeline-line {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(to bottom, #ff6b00, #ff8c3a);
-                    transform: scaleY(0);
-                    transform-origin: top;
-                }
-
-                .steps-container {
-                    position: relative;
-                    padding-left: 100px;
-                }
-
-                .step {
-                    position: relative;
-                    margin-bottom: 120px;
-                    opacity: 0.3;
-                    transition: opacity 0.3s ease;
-                }
-
-                .step:last-child {
-                    margin-bottom: 0;
-                }
-
-                .step.active {
-                    opacity: 1;
-                }
-
-                .step-marker {
-                    position: absolute;
-                    left: -85px;
-                    top: 0;
-                    width: 60px;
-                    height: 60px;
-                    background-color: #1a1a1a;
-                    border: 4px solid #2a2a2a;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.5rem;
-                    font-weight: 700;
-                    color: #666;
-                    transition: all 0.3s ease;
-                    z-index: 2;
-                }
-
-                .step.active .step-marker {
-                    background-color: #ff6b00;
-                    border-color: #ff6b00;
-                    color: #ffffff;
-                    transform: scale(1.1);
-                    box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
-                }
-
-                .step-content h3 {
+                .question-text {
                     font-size: 1.8rem;
-                    font-weight: 700;
-                    color: #ffffff;
-                    margin-bottom: 16px;
-                }
-
-                .step-question {
-                    font-size: 1.4rem;
-                    color: #ff6b00;
-                    margin-bottom: 20px;
-                    line-height: 1.4;
                     font-weight: 600;
+                    margin-bottom: 40px;
+                    line-height: 1.4;
                 }
-
-                .step-text p {
+                .button-group {
+                    display: flex;
+                    gap: 20px;
+                    margin-bottom: 40px;
+                }
+                .choice-btn {
+                    flex: 1;
+                    padding: 16px;
                     font-size: 1.1rem;
-                    line-height: 1.8;
-                    color: #cccccc;
+                    font-weight: 600;
+                    border-radius: 12px;
+                    border: 1px solid #444;
+                    background: transparent;
+                    color: #fff;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+                .choice-btn:hover {
+                    border-color: #ff6b00;
+                    background: rgba(255, 107, 0, 0.1);
+                }
+                .explanation-container {
+                    border-top: 1px solid #333;
+                    padding-top: 40px;
+                }
+                .explanation-text {
+                    margin-bottom: 30px;
+                }
+                .explanation-text p {
+                    color: #ccc;
+                    line-height: 1.7;
+                    font-size: 1.1rem;
                     margin-bottom: 16px;
                 }
-
-                .step-text p:last-child {
-                    margin-bottom: 0;
+                .next-btn, .submit-btn {
+                    background: #ff6b00;
+                    color: #fff;
+                    border: none;
+                    padding: 16px 40px;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+                .next-btn:hover, .submit-btn:hover {
+                    background: #ff8c3a;
+                    transform: translateY(-2px);
+                }
+                .form-heading {
+                    font-size: 1.8rem;
+                    margin-bottom: 12px;
+                }
+                .form-subtext {
+                    color: #ccc;
+                    margin-bottom: 40px;
+                    font-size: 1.1rem;
+                }
+                .form-grid {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                    margin-bottom: 40px;
+                }
+                .form-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+                .form-group label {
+                    font-size: 0.95rem;
+                    font-weight: 500;
+                    color: #999;
+                }
+                .form-group input {
+                    background: #121212;
+                    border: 1px solid #333;
+                    padding: 14px 18px;
+                    border-radius: 12px;
+                    color: #fff;
+                    font-size: 1rem;
+                    transition: all 0.2s ease;
+                }
+                .form-group input:focus {
+                    outline: none;
+                    border-color: #ff6b00;
+                    box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+                }
+                .submit-btn {
+                    width: 100%;
+                }
+                .success-box {
+                    text-align: center;
+                    padding: 80px 40px;
+                }
+                .success-heading {
+                    font-size: 1.8rem;
+                    color: #4ade80;
                 }
 
                 @media (max-width: 768px) {
-                    .guided-process {
-                        padding: 80px 20px;
+                    .step-box, .form-box {
+                        padding: 30px 20px;
                     }
-
-                    .gp-heading {
-                        font-size: 2rem;
-                    }
-
-                    .gp-intro {
-                        font-size: 1rem;
-                        margin-bottom: 60px;
-                    }
-
-                    .timeline-track {
-                        left: 20px;
-                    }
-
-                    .steps-container {
-                        padding-left: 70px;
-                    }
-
-                    .step {
-                        margin-bottom: 80px;
-                    }
-
-                    .step-marker {
-                        left: -60px;
-                        width: 50px;
-                        height: 50px;
-                        font-size: 1.2rem;
-                    }
-
-                    .step-content h3 {
+                    .question-text {
                         font-size: 1.4rem;
                     }
-
-                    .step-content p {
-                        font-size: 1rem;
+                    .button-group {
+                        flex-direction: column;
                     }
                 }
             `}</style>
