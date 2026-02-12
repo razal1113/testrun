@@ -1,11 +1,84 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const STEPS = [
+    {
+        id: 1,
+        question: "Oletko pyytänyt tai saanut poliisilta luvan valvottuun ajo-oikeuteen?",
+        answer: (
+            <>
+                <p>Valvottua ajo-oikeutta kannattaa pyytää poliisilta heti tai viimeistään rattijuopumusasian käsittelyn yhteydessä tuomioistuimelta.</p>
+                <p>Suosittelemme varmistamaan poliisilta, että sinulla on mahdollisuus saada alkolukkoajokortti.</p>
+                <p>Poliisi antaa tarvittaessa lisätietoja alkolukkoajokortin hakemisesta ja siihen liittyvistä vaatimuksista.</p>
+            </>
+        ),
+        buttonText: "Kyllä"
+    },
+    {
+        id: 2,
+        question: "Oletko käynyt lääkärin tai muun terveydenhuollon ammattihenkilön kanssa keskustelun päihteiden käytöstä ja saanut siitä todistuksen?",
+        answer: (
+            <>
+                <p>Hanki todistus lääkärin tai muun terveydenhuollon ammattihenkilön kanssa käydystä keskustelusta (päihteiden käyttö).</p>
+                <p>Todistus liitetään ajokorttihakemukseen ja toimitetaan poliisille.</p>
+                <p>Kun toimitat kaikki tarvittavat dokumentit poliisille, poliisi voi myöntää sinulle väliaikaisen ajokortin.</p>
+            </>
+        ),
+        buttonText: "Kyllä"
+    },
+    {
+        id: 3,
+        question: "Oletko valmis vuokraamaan alkolukon?",
+        answer: (
+            <>
+                <p>Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.</p>
+                <p>Sopimuksen täyttämisen jälkeen allekirjoitat sopimuksen ”Allekirjoita”-painikkeen kautta sähköisesti.</p>
+                <p>Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.</p>
+                <p>Vuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.</p>
+                <p>Mikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.</p>
+                <p>Mikäli luottotiedot eivät ole kunnossa, saat ilmoituksen, että vuokrasopimus edellyttää takaajaa.</p>
+                <p>Tällöin voit syöttää takaajan tiedot suoraan vuokrasopimukseen ja lähettää takaajalle linkin sähköistä allekirjoitusta varten.</p>
+                <p>Vuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen.</p>
+            </>
+        ),
+        buttonText: "Kyllä"
+    },
+    {
+        id: 4,
+        question: "Oletko valmis varaamaan asennusajan ja auton muutoskatsastuksen?",
+        answer: (
+            <>
+                <p>Kun painat ”Varaa asennus”, sinut ohjataan ajanvarausjärjestelmään.</p>
+                <p>Ajanvarauksessa:</p>
+                <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginBottom: '16px', color: '#ccc' }}>
+                    <li>Valitset alkolukon asennuksen</li>
+                    <li>Syötät postinumerosi</li>
+                    <li>Näet lähimmät asennuspisteet</li>
+                    <li>Valitset sinulle sopivan ajan kalenterista</li>
+                </ul>
+                <p>Kun asennusaika on varattu, saamme siitä automaattisesti tiedon ja toimitamme alkolukon valittuun asennuspisteeseen.</p>
+            </>
+        ),
+        buttonText: "Kyllä"
+    }
+];
 
 const GuidedProcess = () => {
-    // State-based flow: 'step1', 'form', 'confirmation', 'final-message'
-    const [currentState, setCurrentState] = useState('step1');
+    // Current step index user is interacting with (0-3)
+    const [activeStepIndex, setActiveStepIndex] = useState(0);
+    // Tracks which steps have been "revealed" (answer shown)
+    const [revealedSteps, setRevealedSteps] = useState(new Set());
+    // Tracks which steps have been completed (Jatka clicked)
+    const [completedSteps, setCompletedSteps] = useState(new Set());
 
-    const contentRef = useRef(null);
+    const [showForm, setShowForm] = useState(false);
+    const [formSubmitted, setFormSubmitted] = useState(false);
+
+    const stepRefs = useRef([]);
+    const formRef = useRef(null);
 
     const [formData, setFormData] = useState({
         nimi: '',
@@ -17,63 +90,46 @@ const GuidedProcess = () => {
         rekisterinumero: ''
     });
 
-    const scrollToTop = () => {
-        if (contentRef.current) {
-            contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const handleReveal = (index) => {
+        setRevealedSteps(prev => new Set(prev).add(index));
+        // Animate revealing
+        const answerEl = stepRefs.current[index].querySelector('.step-answer');
+        gsap.fromTo(answerEl,
+            { height: 0, opacity: 0 },
+            { height: 'auto', opacity: 1, duration: 0.5, ease: 'power2.out' }
+        );
+    };
+
+    const handleNextStep = (index) => {
+        setCompletedSteps(prev => new Set(prev).add(index));
+
+        if (index < STEPS.length - 1) {
+            setActiveStepIndex(index + 1);
+            // Smooth scroll to next step after a short delay
+            setTimeout(() => {
+                const nextStepEl = stepRefs.current[index + 1];
+                if (nextStepEl) {
+                    nextStepEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Animate next step appearance
+                    gsap.fromTo(nextStepEl,
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.5 }
+                    );
+                }
+            }, 100);
+        } else {
+            // Finished last step
+            setShowForm(true);
+            setTimeout(() => {
+                if (formRef.current) {
+                    formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    gsap.fromTo(formRef.current,
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.5 }
+                    );
+                }
+            }, 100);
         }
-    };
-
-    const handleJatka = () => {
-        scrollToTop();
-        gsap.to(contentRef.current, {
-            opacity: 0,
-            y: -10,
-            duration: 0.3,
-            onComplete: () => {
-                setCurrentState('form');
-                gsap.fromTo(contentRef.current,
-                    { opacity: 0, y: 10 },
-                    { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
-                );
-            }
-        });
-    };
-
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        scrollToTop();
-        gsap.to(contentRef.current, {
-            opacity: 0,
-            y: -10,
-            duration: 0.3,
-            onComplete: () => {
-                setCurrentState('confirmation');
-                gsap.fromTo(contentRef.current,
-                    { opacity: 0, y: 10 },
-                    { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
-                );
-            }
-        });
-    };
-
-    const handleYes = () => {
-        window.location.href = 'https://fixushuolto.fi/eox/huolto';
-    };
-
-    const handleNo = () => {
-        scrollToTop();
-        gsap.to(contentRef.current, {
-            opacity: 0,
-            y: -10,
-            duration: 0.3,
-            onComplete: () => {
-                setCurrentState('final-message');
-                gsap.fromTo(contentRef.current,
-                    { opacity: 0, y: 10 },
-                    { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
-                );
-            }
-        });
     };
 
     const handleFormChange = (e) => {
@@ -81,6 +137,28 @@ const GuidedProcess = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+    };
+
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        setFormSubmitted(true);
+        // Scroll to confirmation area
+        setTimeout(() => {
+            const successEl = document.getElementById('confirmation-area');
+            if (successEl) {
+                successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    };
+
+    const handleFinalYes = () => {
+        window.location.href = 'https://fixushuolto.fi/eox/huolto';
+    };
+
+    // No action needed for No, simpler message
+    const [finalMessageVisible, setFinalMessageVisible] = useState(false);
+    const handleFinalNo = () => {
+        setFinalMessageVisible(true);
     };
 
     return (
@@ -91,78 +169,99 @@ const GuidedProcess = () => {
                     Alla olevat vaiheet ohjaavat sinua askel askeleelta alkolukkoajokortin hakemisessa ja alkolukon vuokraamisessa.
                 </p>
 
-                <div className="interactive-container" ref={contentRef}>
-                    {currentState === 'step1' && (
-                        <div className="step-box">
-                            <h3 className="question-text">Oletko valmis vuokraamaan alkolukon?</h3>
-                            <div className="explanation-text">
-                                <p>Kun alkolukon vuokrasopimus avautuu näytölle, voit täyttää tarvittavat tiedot sähköisesti.</p>
-                                <p>Sopimuksen täyttämisen jälkeen allekirjoitat sopimuksen sähköisesti.</p>
-                                <p>Tämän jälkeen Breatech Finland Oy saa automaattisesti ilmoituksen vuokrasopimuksen allekirjoituksesta.</p>
-                                <p>Vuokrauksen yhteydessä suoritetaan automaattinen luottotietojen tarkistus.</p>
-                                <p>Mikäli luottotiedot ovat kunnossa, sopimus etenee normaalisti.</p>
-                                <p>Mikäli luottotiedot eivät ole kunnossa, vuokrasopimus edellyttää takaajaa.</p>
-                                <p>Vuokrasopimus astuu voimaan, kun takaaja on allekirjoittanut sopimuksen.</p>
-                            </div>
-                            <button className="next-btn" onClick={handleJatka}>Jatka</button>
-                        </div>
-                    )}
+                <div className="steps-container">
+                    {STEPS.map((step, index) => {
+                        // Only show steps that are active or completed/revealed history
+                        if (index > activeStepIndex) return null;
 
-                    {currentState === 'form' && (
-                        <div className="step-box">
-                            <h3 className="form-section-heading">VUOKRANOTTAJA</h3>
-                            <form className="guided-form" onSubmit={handleFormSubmit}>
-                                <div className="form-grid">
-                                    <div className="form-group">
-                                        <label>Nimi / Yritys</label>
-                                        <input type="text" name="nimi" value={formData.nimi} onChange={handleFormChange} required />
+                        const isRevealed = revealedSteps.has(index);
+                        const isCompleted = completedSteps.has(index);
+
+                        return (
+                            <div
+                                key={step.id}
+                                ref={el => stepRefs.current[index] = el}
+                                className={`step-item ${isCompleted ? 'completed' : ''}`}
+                            >
+                                <h3 className="question-text">{step.question}</h3>
+
+                                {!isRevealed && !isCompleted && (
+                                    <button className="action-btn" onClick={() => handleReveal(index)}>
+                                        {step.buttonText}
+                                    </button>
+                                )}
+
+                                <div className="step-answer" style={{ display: isRevealed ? 'block' : 'none', opacity: isRevealed ? 1 : 0 }}>
+                                    <div className="answer-content">
+                                        {step.answer}
                                     </div>
-                                    <div className="form-group">
-                                        <label>Osoite</label>
-                                        <input type="text" name="osoite" value={formData.osoite} onChange={handleFormChange} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Postinumero ja postitoimipaikka</label>
-                                        <input type="text" name="postinumero" value={formData.postinumero} onChange={handleFormChange} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Henkilötunnus / Y-tunnus</label>
-                                        <input type="text" name="tunnus" value={formData.tunnus} onChange={handleFormChange} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Puhelin</label>
-                                        <input type="tel" name="puhelin" value={formData.puhelin} onChange={handleFormChange} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Sähköposti</label>
-                                        <input type="email" name="sahkoposti" value={formData.sahkoposti} onChange={handleFormChange} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Ajoneuvon rekisteritunnus</label>
-                                        <input type="text" name="rekisterinumero" value={formData.rekisterinumero} onChange={handleFormChange} required />
-                                    </div>
+                                    {!isCompleted && (
+                                        <button className="action-btn continue-btn" onClick={() => handleNextStep(index)}>
+                                            Jatka
+                                        </button>
+                                    )}
                                 </div>
-                                <button type="submit" className="submit-btn">Lähetä</button>
-                            </form>
-                        </div>
-                    )}
-
-                    {currentState === 'confirmation' && (
-                        <div className="step-box">
-                            <h3 className="question-text">Haluatko varata asennusajan nyt?</h3>
-                            <div className="button-group">
-                                <button className="choice-btn" onClick={handleYes}>Kyllä</button>
-                                <button className="choice-btn" onClick={handleNo}>Ei</button>
                             </div>
-                        </div>
-                    )}
-
-                    {currentState === 'final-message' && (
-                        <div className="success-box">
-                            <h3 className="success-heading">Kiitos. Olemme sinuun yhteydessä mahdollisimman pian.</h3>
-                        </div>
-                    )}
+                        );
+                    })}
                 </div>
+
+                {showForm && !formSubmitted && (
+                    <div className="form-container" ref={formRef}>
+                        <h3 className="form-section-heading">VUOKRANOTTAJA</h3>
+                        <form className="guided-form" onSubmit={handleFormSubmit}>
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label>Nimi / Yritys</label>
+                                    <input type="text" name="nimi" value={formData.nimi} onChange={handleFormChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Osoite</label>
+                                    <input type="text" name="osoite" value={formData.osoite} onChange={handleFormChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Postinumero ja postitoimipaikka</label>
+                                    <input type="text" name="postinumero" value={formData.postinumero} onChange={handleFormChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Henkilötunnus / Y-tunnus</label>
+                                    <input type="text" name="tunnus" value={formData.tunnus} onChange={handleFormChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Puhelin</label>
+                                    <input type="tel" name="puhelin" value={formData.puhelin} onChange={handleFormChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Sähköposti</label>
+                                    <input type="email" name="sahkoposti" value={formData.sahkoposti} onChange={handleFormChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Ajoneuvon rekisteritunnus</label>
+                                    <input type="text" name="rekisterinumero" value={formData.rekisterinumero} onChange={handleFormChange} required />
+                                </div>
+                            </div>
+                            <button type="submit" className="action-btn submit-btn">Lähetä</button>
+                        </form>
+                    </div>
+                )}
+
+                {formSubmitted && (
+                    <div id="confirmation-area" className="confirmation-box">
+                        {!finalMessageVisible ? (
+                            <>
+                                <h3 className="question-text">Haluatko siirtyä varaamaan asennusajan nyt?</h3>
+                                <div className="button-group">
+                                    <button className="action-btn choice-btn" onClick={handleFinalYes}>Kyllä</button>
+                                    <button className="action-btn choice-btn" onClick={handleFinalNo}>Ei</button>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="final-message">
+                                <h3 className="success-heading">Kiitos. Olemme sinuun yhteydessä mahdollisimman pian.</h3>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <style>{`
@@ -170,6 +269,10 @@ const GuidedProcess = () => {
                     background-color: #121212;
                     padding: 120px 20px;
                     color: #ffffff;
+                }
+                .container {
+                     max-width: 800px; /* Keep consistent with design */
+                     margin: 0 auto;
                 }
                 .gp-heading {
                     font-size: clamp(2rem, 5vw, 3rem);
@@ -185,55 +288,73 @@ const GuidedProcess = () => {
                     color: #cccccc;
                     line-height: 1.6;
                 }
-                .interactive-container {
-                    max-width: 800px;
-                    margin: 0 auto;
-                    min-height: 480px; /* Increased slightly for stability */
-                    overflow-anchor: none; /* Prevent scroll anchoring jumps */
-                }
-                .step-box, .success-box {
+
+                .step-item {
                     background: #1a1a1a;
-                    padding: 40px;
-                    border-radius: 20px;
+                    padding: 30px;
+                    border-radius: 16px;
                     border: 1px solid #333;
+                    margin-bottom: 24px;
+                    transition: all 0.3s ease;
                 }
+                .step-item.completed {
+                    opacity: 0.6; /* Dim completed steps slightly to focus on new one */
+                    border-color: #222;
+                }
+                .step-item.completed:hover {
+                    opacity: 1;
+                }
+
                 .question-text {
-                    font-size: 1.8rem;
+                    font-size: 1.4rem;
                     font-weight: 600;
-                    margin-bottom: 30px;
+                    margin-bottom: 20px;
                     line-height: 1.4;
+                    color: #fff;
                 }
-                .explanation-text {
-                    margin-bottom: 30px;
-                }
-                .explanation-text p {
+                
+                .answer-content {
+                    margin-bottom: 24px;
                     color: #ccc;
                     line-height: 1.7;
                     font-size: 1.1rem;
-                    margin-bottom: 16px;
+                    padding-top: 10px;
+                    border-top: 1px solid rgba(255,255,255,0.05);
                 }
-                .next-btn, .submit-btn, .choice-btn {
-                    background: var(--color-accent-orange) !important;
+                .answer-content p {
+                    margin-bottom: 12px;
+                }
+
+                .action-btn {
+                    background: var(--color-accent-orange);
                     color: #fff;
                     border: none;
-                    padding: 16px 40px;
-                    font-size: 1.1rem;
+                    padding: 14px 32px;
+                    font-size: 1rem;
                     font-weight: 600;
                     border-radius: 50px;
                     cursor: pointer;
                     transition: all 0.3s ease;
-                    display: block;
-                    margin: 0 auto;
+                    display: inline-block;
                     box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
                 }
-                .next-btn:hover, .submit-btn:hover, .choice-btn:hover {
-                    background: var(--color-accent-orange-hover) !important;
+                .action-btn:hover {
+                    background: var(--color-accent-orange-hover);
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 25px rgba(255, 107, 0, 0.5);
+                    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
                 }
-                .choice-btn {
-                    flex: 1;
-                    margin: 0;
+                .continue-btn {
+                    margin-top: 10px;
+                }
+
+                .form-container {
+                    background: #1a1a1a;
+                    padding: 40px;
+                    border-radius: 20px;
+                    border: 1px solid #333;
+                    margin-top: 40px;
+                    overflow-anchor: none; /* Layout stability */
+                    min-height: 600px;
                 }
                 .form-section-heading {
                     font-size: 1.4rem;
@@ -245,8 +366,8 @@ const GuidedProcess = () => {
                 .form-grid {
                     display: flex;
                     flex-direction: column;
-                    gap: 24px;
-                    margin-bottom: 40px;
+                    gap: 20px;
+                    margin-bottom: 30px;
                 }
                 .form-group {
                     display: flex;
@@ -264,8 +385,7 @@ const GuidedProcess = () => {
                     padding: 14px 18px;
                     border-radius: 12px;
                     color: #fff;
-                    color: #fff;
-                    font-size: 16px; /* Prevent iOS zoom */
+                    font-size: 16px; /* No zoom */
                     transition: all 0.2s ease;
                 }
                 .form-group input:focus {
@@ -275,30 +395,51 @@ const GuidedProcess = () => {
                 }
                 .submit-btn {
                     width: 100%;
+                    text-align: center;
+                }
+
+                .confirmation-box {
+                    background: #1a1a1a;
+                    padding: 40px;
+                    border-radius: 20px;
+                    border: 1px solid #333;
+                    margin-top: 40px;
+                    text-align: center;
+                    min-height: 300px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
                 }
                 .button-group {
                     display: flex;
                     gap: 20px;
                     margin-top: 20px;
                 }
-                .success-box {
-                    text-align: center;
-                    padding: 80px 40px;
+                .choice-btn {
+                    min-width: 120px;
                 }
                 .success-heading {
-                    font-size: 1.8rem;
+                    font-size: 1.6rem;
                     color: #4ade80;
                 }
-
+                
                 @media (max-width: 768px) {
-                    .step-box {
-                        padding: 30px 20px;
+                    .step-item {
+                        padding: 20px;
                     }
                     .question-text {
-                        font-size: 1.4rem;
+                        font-size: 1.2rem;
+                    }
+                    .form-container, .confirmation-box {
+                        padding: 24px;
                     }
                     .button-group {
                         flex-direction: column;
+                        width: 100%;
+                    }
+                    .choice-btn {
+                        width: 100%;
                     }
                 }
             `}</style>
