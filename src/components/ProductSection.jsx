@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import breatechDevice from '../assets/breatech-device.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -76,7 +77,7 @@ const ProductSection = () => {
                         <div className="glow-effect"></div>
                         <img
                             ref={imageRef}
-                            src="/assets/breatech-device.png"
+                            src={breatechDevice}
                             alt="Breatech B1000 Alkolukko"
                             className="product-image"
                         />
