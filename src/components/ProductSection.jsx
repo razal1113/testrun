@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import breatechDevice from '../assets/breatech-device.png';
+import breatechDevice from '../assets/breatech-device.webm';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -75,12 +75,16 @@ const ProductSection = () => {
                     {/* LEFT COLUMN: Product Highlight */}
                     <div className="product-image-col">
                         <div className="glow-effect"></div>
-                        <img
+                        <video
                             ref={imageRef}
-                            src={breatechDevice}
-                            alt="Breatech B1000 Alkolukko"
                             className="product-image"
-                        />
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                        >
+                            <source src={breatechDevice} type="video/webm" />
+                        </video>
                         <div className="shadow-effect"></div>
                     </div>
 
